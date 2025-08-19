@@ -1,5 +1,8 @@
 from typing import Any
 from copy import Error
+
+
+
 class MetaBank(type):
     def __new__(cls, name:str, bases:tuple[type,...], attrs:dict[str, Any]):
         return super().__new__(cls, name, bases, attrs)

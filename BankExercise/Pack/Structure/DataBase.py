@@ -4,6 +4,8 @@ from functools import cache
 from typing import List, Dict, Any, Optional
 from Pack.Structure.Person import Person  # Ensure this import path is correct
 
+
+
 class DataBase:
     def __init__(self, path: Optional[str] = None, file: str = 'data.json'):
         """Initialize the database with optional path and filename.
@@ -98,7 +100,7 @@ class DataBase:
             if user.get_full_name() == values[i]['full_name']:
                 print(f"user id is: {values[i]['id']}")
                 return [True, values[i]]
-        return [False,values[0]]
+        return [False,values]
 
 
     def read_record(self, record_id: int) -> Dict[str, Any]:

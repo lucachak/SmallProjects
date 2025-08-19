@@ -1,3 +1,4 @@
+import os
 from Pack.Structure.Bank import Bank,BankAccount,AccountType
 from Pack.Structure.Person import Person
 from Pack.Structure.DataBase import PWDB, USDB
@@ -26,26 +27,6 @@ revolut_account = BankAccount(
         account_type = AccountType(2),
         bank_holder = revolut_bank,
         level=2
-        )
-
-lucas = Person(
-            full_name="Lucas de Almeida Lucachak",
-            age=23,
-            cpf="444.521.338-12",
-            rg="20.005.517-8",
-            mom="Rosana Gomes",
-            dad="Adilson rodrigues",
-            bank_account= wise_account
-            )
-
-jorge = Person(
-        full_name="Jorge Smiths",
-        age=23,
-        cpf="324.442.661-88",
-        rg="98.651.445-12",
-        mom="Rosangela Da Silva",
-        dad="Joseli Pereira",
-        bank_account= revolut_account
         )
 
 
@@ -118,9 +99,9 @@ def create_bank_account() -> BankAccount|None:
                     level=2,
                     )
 
-
         else:
             raise ValueError
+    
     except ValueError:
         if bank_opt.lower() == "wise":
             return BankAccount(
@@ -178,6 +159,8 @@ def create_database()-> list[USDB|PWDB]:
         pass_db_name = "PassData"
 
     else:
+        os.system("clear")
+        print("Database not set properly\ndefault db is UserData and PassData on the app folder\n\n")
         user_db_name = "UserData"
         pass_db_name = "PassData"
 
