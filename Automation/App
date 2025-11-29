@@ -1,0 +1,196 @@
+#!/home/lucas/Documents/Python/Automation/.venv/bin/python3 App
+
+from customtkinter import *
+from classes.Page1 import Page1
+from classes.Page2 import Page2
+from classes.Page3 import Page3
+from classes.Page4 import Page4
+from classes.LoginPage import LoginPage
+from classes.FileManager import FileManagerApp
+
+class App(CTk):
+    def __init__(self):
+        super().__init__()
+        self._setup_window()
+        self._setup_state()
+        self._show_login_page()
+
+    def _setup_window(self):
+        """Configure main window settings"""
+        self.title("App com Login e Dashboard")
+        self.geometry("900x600")
+        set_appearance_mode("dark")
+        set_default_color_theme("blue")
+
+    def _setup_state(self):
+        """Initialize application state"""
+        self.current_page_class = None
+        self.sidebar_visible = True
+        self.pages = {}
+
+    def _show_login_page(self):
+        """Display login page"""
+        self.login_page = LoginPage(self, on_login=self.login_success)
+        self.login_page.pack(expand=True, fill="both")
+
+    def login_success(self, username):
+        """Handle successful login"""
+        self.login_page.destroy()
+        self._create_dashboard(username)
+        self.start_auto_logout_timer()
+
+    def _create_dashboard(self, username):
+        """Create main dashboard layout"""
+        self._setup_grid_layout()
+        self._setup_event_bindings()
+        self._create_navbar(username)
+        self._create_main_container()
+        self._create_footer()
+        self.show_page(Page1)
+
+    def _setup_grid_layout(self):
+        """Configure main grid layout"""
+        self.grid_rowconfigure(0, weight=0)   # Navbar
+        self.grid_rowconfigure(1, weight=1)   # Content
+        self.grid_rowconfigure(2, weight=0)   # Footer
+        self.grid_columnconfigure(0, weight=1)
+
+    def _setup_event_bindings(self):
+        """Setup event bindings for auto-logout"""
+        self.bind_all("<Any-KeyPress>", lambda e: self.start_auto_logout_timer())
+        self.bind_all("<Any-Button>", lambda e: self.start_auto_logout_timer())
+
+    def _create_navbar(self, username):
+        """Create navigation bar"""
+        self.navbar = CTkFrame(self, height=50)
+        self.navbar.grid(row=0, column=0, sticky="nsew")
+        
+        CTkLabel(
+            self.navbar,
+            text=f"🌐 Bem-vindo, {username}",
+            font=("Arial", 16, "bold")
+        ).pack(pady=10)
+
+    def _create_main_container(self):
+        """Create main content container with sidebar"""
+        self.container = CTkFrame(self)
+        self.container.grid(row=1, column=0, sticky="nsew")
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=0)  # Sidebar
+        self.container.grid_columnconfigure(1, weight=1)  # Main content
+
+        self._create_sidebar()
+        self._create_main_content()
+
+    def _create_sidebar(self):
+        """Create sidebar with navigation buttons"""
+        self.sidebar = CTkFrame(self.container, width=200)
+        self.sidebar.grid(row=0, column=0, sticky="ns")
+
+        # Sidebar title
+        CTkLabel(self.sidebar, text="📑 Areas", 
+                font=("Arial", 14, "bold")).pack(pady=10)
+
+        # Navigation buttons
+        nav_buttons = [
+            ("🐧 Linux Area", Page1),
+            ("📊 Database Area", Page2),
+            ("Api Control", Page3),
+            ("Excel Automation", Page4),
+            ("File Manager", FileManagerApp)
+        ]
+
+        for text, page_class in nav_buttons:
+            CTkButton(
+                self.sidebar, 
+                text=text, 
+                command=lambda pc=page_class: self.show_page(pc)
+            ).pack(pady=5, padx=10, fill="x")
+
+        # Logout button
+        CTkButton(
+            self.sidebar,
+            text="🚪 Logout",
+            fg_color="red",
+            hover_color="#b91c1c",
+            command=self.logout
+        ).pack(side="bottom", pady=10, padx=10, fill="x")
+
+    def _create_main_content(self):
+        """Create main content area"""
+        self.main_content = CTkFrame(self.container)
+        self.main_content.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+
+    def _create_footer(self):
+        """Create footer"""
+        self.footer = CTkFrame(self, height=40)
+        self.footer.grid(row=2, column=0, sticky="nsew")
+        CTkLabel(self.footer, text="🔻 Footer").pack(pady=5)
+
+    def show_page(self, page_class):
+        """Display the specified page"""
+        self._handle_sidebar_visibility(page_class)
+        self._initialize_page(page_class)
+        self._display_page(page_class)
+
+    def _handle_sidebar_visibility(self, page_class):
+        """Show/hide sidebar based on page"""
+        if page_class == FileManagerApp:
+            self.hide_sidebar()
+        elif not self.sidebar_visible:
+            self.show_sidebar()
+
+    def _initialize_page(self, page_class):
+        """Initialize page if not already created"""
+        if page_class not in self.pages:
+            page = page_class(self.main_content)
+            
+            # Set main app reference for FileManagerApp
+            if page_class == FileManagerApp:
+                page.set_main_app(self)
+                
+            self.pages[page_class] = page
+
+    def _display_page(self, page_class):
+        """Hide all pages and show the selected one"""
+        # Hide all pages
+        for page in self.pages.values():
+            page.pack_forget()
+        
+        # Show selected page
+        self.pages[page_class].pack(fill="both", expand=True)
+        self.current_page_class = page_class
+
+    def hide_sidebar(self):
+        """Hide sidebar and maximize main content"""
+        if self.sidebar_visible:
+            self.sidebar.grid_forget()
+            self.main_content.grid(row=0, column=0, columnspan=2, sticky="nsew", padx=10, pady=10)
+            self.sidebar_visible = False
+
+    def show_sidebar(self):
+        """Show sidebar and restore normal layout"""
+        if not self.sidebar_visible:
+            self.sidebar.grid(row=0, column=0, sticky="ns")
+            self.main_content.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+            self.sidebar_visible = True
+
+    def logout(self):
+        """Handle user logout"""
+        # Destroy all widgets
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        # Reset state
+        self._setup_state()
+        self._show_login_page()
+
+    def start_auto_logout_timer(self, timeout_ms=120000):
+        """Start auto-logout timer"""
+        if hasattr(self, "_logout_job"):
+            self.after_cancel(self._logout_job)
+        self._logout_job = self.after(timeout_ms, self.logout)
+
+if __name__ == "__main__":
+    app = App()
+    app.mainloop()

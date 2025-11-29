@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Flask CRUD</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .item { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
+        input[type="text"] { padding: 8px; margin: 5px; }
+        button { padding: 8px 15px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>My Items</h1>
+
+    <!-- Create Form -->
+    <h3>Create a New Item</h3>
+    <form action="{{ url_for('create') }}" method="post">
+        <input type="text" name="item_name" placeholder="Enter item name" required>
+        <button type="submit">Create</button>
+    </form>
+
+    <hr>
+
+    <!-- Read/Display Items -->
+    <h3>Existing Items</h3>
+    {% for item in items %}
+        <div class="item">
+            <!-- Update Form for each item -->
+            <form action="{{ url_for('update', item_id=item.id) }}" method="post" style="display: inline;">
+                <input type="text" name="updated_name" value="{{ item.name }}">
+                <button type="submit">Update</button>
+            </form>
+
+            <!-- Delete Form for each item -->
+            <form action="{{ url_for('delete', item_id=item.id) }}" method="post" style="display: inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </div>
+    {% endfor %}
+
+</body>
+</html>
