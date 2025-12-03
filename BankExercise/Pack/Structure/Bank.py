@@ -1,101 +1,99 @@
-from typing import Any
 from copy import Error
-
+from typing import Any
 
 
 class MetaBank(type):
-    def __new__(cls, name:str, bases:tuple[type,...], attrs:dict[str, Any]):
+    def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]):
         return super().__new__(cls, name, bases, attrs)
 
-class Bank(metaclass=MetaBank):
 
-    def __init__(self, name:str, location:str, id_code:int|str ) -> None:
+class Bank(metaclass=MetaBank):
+    def __init__(self, name: str, location: str, id_code: int | str) -> None:
         self.__location = location
         self.__id = id_code
         self.__name = name
 
-
-    def get_id_code(self)->str:
+    def get_id_code(self) -> str:
         return f"Bank Id: {self.__id}"
 
-    def set_id_code(self, id_code:str|int)->None:
-        self.__id =  f"{id_code}"
+    def set_id_code(self, id_code: str | int) -> None:
+        self.__id = f"{id_code}"
 
-    def get_location(self)->str:
+    def get_location(self) -> str:
         return f"Bank place: {self.__location}"
 
-    def set_location(self, location:str)->None:
+    def set_location(self, location: str) -> None:
         self.__location = location
 
-    def get_name(self)->str:
+    def get_name(self) -> str:
         return f"Bank name: {self.__name}"
 
-    def set_name(self, name:str)->None:
+    def set_name(self, name: str) -> None:
         self.__name = name
 
-
-    def __str__(self) ->str:
+    def __str__(self) -> str:
         return f"Bank info: {self.__name}, {self.__id}, {self.__location}"
 
 
 class AccountType:
-
-    def __init__(self,account_choice:int|None) -> None:
+    def __init__(self, account_choice: int | None) -> None:
         self.__account_type = {
             1: "Savings Account",
             2: "Current Account",
-            3: "Special Account"
+            3: "Special Account",
         }
 
-        if (account_choice != None) and (account_choice in self.__account_type):
+        if (account_choice is not None) and (account_choice in self.__account_type):
             self.__account = self.__account_type[account_choice]
         else:
             raise Error("Error chosing the account type")
 
-
-    def get_account_type(self)->str:
+    def get_account_type(self):
         return f"{self.__account}"
 
-    def __str__(self)->str:
+    def __str__(self) -> str:
         return f"{self.__account}"
 
-    '''
+    """
     CORRENTE E POUPANCA, CORRENTE(DEBITO, CREDITO), POUPANCA(DEBITO) RETORNA UM REDIMENTO (110% CDI)
-    '''
+    """
 
 
 class BankAccount:
+    def __init__(
+        self,
+        account_type: AccountType,
+        bank_holder: Bank | None,
+        level: int = 0,
+        balance: float | int = 0,
+    ) -> None:
+        self.__account_type: AccountType | str = account_type
+        self.__bank_holder: Bank | None = bank_holder
+        self.__level: int | None = level
+        self.__balance = balance
 
-    def __init__(self,
-                 account_type:AccountType|str,
-                 bank_holder:Bank|None,
-                 level:int=0,
-                 balance:float|int=0
-                 ) -> None:
+    def get_account_type(self) -> AccountType:
+        return self.__account_type if not isinstance(self.__account_type, str)
 
-        self.__account_type:AccountType|str = account_type
-        self.__bank_holder:Bank|None = bank_holder
-        self.__level:int|None = level
-        self.__balance = 0
-
-    def get_account_type(self)->AccountType|str:
-        return self.__account_type
-    def set_account_type(self, account:AccountType|str)->AccountType|None:
+    def set_account_type(self, account: AccountType) -> None:
         self.__account_type = account
 
-    def get_balance(self) -> float|int:
+    def get_balance(self) -> float | int:
         return self.__balance
-    def set_balance(self, balance:int|float) -> None:
+
+    def set_balance(self, balance: int | float) -> None:
         self.__balance = balance if balance > 0 else self.__balance
 
-    def get_bank_holder(self)->Bank|None:
+    def get_bank_holder(self) -> Bank | None:
         return self.__bank_holder
-    def set_bank_holder(self, bank_holder:Bank)->None:
+
+    def set_bank_holder(self, bank_holder: Bank) -> None:
         self.__bank_holder = bank_holder
 
-    def get_level(self)->int|None:
+    def get_level(self) -> int | None:
         return self.__level
-    def set_level(self, level:int)->None:
+
+    def set_level(self, level: int) -> None:
         self.__level = level
 
     def __str__(self) -> str:

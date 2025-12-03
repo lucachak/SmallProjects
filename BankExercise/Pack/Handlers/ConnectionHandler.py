@@ -32,7 +32,6 @@ class Connector:
 
     def __check_host(self) -> bool:
 
-        # Initialize variables
         info = self.clear_url(self.__url)
 
         try:
