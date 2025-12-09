@@ -1,0 +1,1 @@
+pyinstaller --noconfirm --onefile --noconsole --add-data "src;src" --add-data "assets;assets" --icon=assets\app.ico main.py
